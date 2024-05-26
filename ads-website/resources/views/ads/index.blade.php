@@ -19,12 +19,14 @@
                     <p class="card-text">{{ $ad->description }}</p>
                     <p class="card-text">{{ $ad->price }} руб.</p>
                     <a href="{{ route('ads.show', $ad->id) }}" class="btn btn-primary">Подробнее</a>
+                    @if(auth()->check() && ($ad->user_id === auth()->id() || auth()->user()->isAdmin()))
                     <a href="{{ route('ads.edit', $ad->id) }}" class="btn btn-secondary">Редактировать</a>
                     <form action="{{ route('ads.destroy', $ad->id) }}" method="POST" class="d-inline-block">
                         @csrf
                         @method('DELETE')
                         <button type="submit" class="btn btn-danger">Удалить</button>
                     </form>
+                    @endif
                 </div>
             </div>
         </div>

@@ -1,9 +1,12 @@
 <?php
 
+// app/Http/Controllers/AdController.php
+
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Ad;
+use Illuminate\Support\Facades\Auth;
 
 class AdController extends Controller
 {
@@ -53,7 +56,7 @@ class AdController extends Controller
     {
         $ad = Ad::findOrFail($id);
 
-        if ($ad->user_id !== auth()->id()) {
+        if ($ad->user_id !== auth()->id() && !auth()->user()->isAdmin()) {
             return redirect()->route('ads.index')->with('error', 'У вас нет прав для редактирования этого объявления');
         }
 
@@ -64,7 +67,7 @@ class AdController extends Controller
     {
         $ad = Ad::findOrFail($id);
 
-        if ($ad->user_id !== auth()->id()) {
+        if ($ad->user_id !== auth()->id() && !auth()->user()->isAdmin()) {
             return redirect()->route('ads.index')->with('error', 'У вас нет прав для редактирования этого объявления');
         }
 
@@ -83,7 +86,7 @@ class AdController extends Controller
     {
         $ad = Ad::findOrFail($id);
 
-        if ($ad->user_id !== auth()->id()) {
+        if ($ad->user_id !== auth()->id() && !auth()->user()->isAdmin()) {
             return redirect()->route('ads.index')->with('error', 'У вас нет прав для удаления этого объявления');
         }
 
@@ -93,9 +96,8 @@ class AdController extends Controller
     }
 
     public function myAds()
-{
-    $ads = auth()->user()->ads()->latest()->get();
-    return view('my_ads', compact('ads'));
-}
-
+    {
+        $ads = auth()->user()->ads()->latest()->get();
+        return view('ads.my_ads', compact('ads'));
+    }
 }
