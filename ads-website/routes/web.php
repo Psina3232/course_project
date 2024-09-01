@@ -5,6 +5,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\UserController;
 
+
 Route::post('ads/{ad}/comments', [CommentController::class, 'store'])->name('comments.store');
 
 
@@ -24,8 +25,6 @@ Route::get('/search', [AdController::class, 'search'])->name('ads.search');
 
 Auth::routes();
 
-
-Auth::routes();
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
