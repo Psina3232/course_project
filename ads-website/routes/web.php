@@ -34,4 +34,3 @@ Route::get('/search', [AdController::class, 'search'])->name('ads.search');
 Route::get('/my-ads', [UserController::class, 'myAds'])->middleware('auth')->name('user.my_ads');
 
 
-

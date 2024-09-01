@@ -12,21 +12,21 @@ class AdminPolicy
 
     public function update(User $user, Ad $ad)
     {
-        return true; // Администратор может редактировать любые объявления
+        return true; 
     }
 
     public function delete(User $user, Ad $ad)
     {
-        return true; // Администратор может удалять любые объявления
+        return true; 
     }
 
     public function deleteComment(User $user)
     {
-        return true; // Администратор может удалять комментарии
+        return true; 
     }
 
     public function deleteUser(User $user)
     {
-        return true; // Администратор может удалять пользователей
+        return true; 
     }
 }

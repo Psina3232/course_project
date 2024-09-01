@@ -9,14 +9,14 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('ads', function (Blueprint $table) {
-            $table->decimal('price', 10, 2)->change(); // Изменяем тип данных столбца
+            $table->decimal('price', 10, 2)->change(); 
         });
     }
 
     public function down(): void
     {
         Schema::table('ads', function (Blueprint $table) {
-            $table->decimal('price', 8, 2)->change(); // Возвращаем к изначальному типу
+            $table->decimal('price', 8, 2)->change();
         });
     }
 };
