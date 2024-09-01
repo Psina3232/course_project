@@ -3,15 +3,17 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\User;
+use Illuminate\Support\Facades\Auth;
+use App\Models\Ad;
 
 class UserController extends Controller
 {
     public function myAds()
     {
-        $user = auth()->user();
+        $user = Auth::user();
+
         $ads = $user->ads()->latest()->get();
-        return view('user.my_ads', compact('user', 'ads'));
+
+        return response()->json($ads);
     }
-    
 }

@@ -1,103 +1,79 @@
 <?php
 
-// app/Http/Controllers/AdController.php
-
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Ad;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
 
 class AdController extends Controller
 {
-    public function index(Request $request)
-    {
-        $search = $request->input('search');
-
-        $query = Ad::query()->latest();
-
-        if ($search) {
-            $query->where('title', 'like', "%{$search}%")
-                ->orWhere('description', 'like', "%{$search}%");
-        }
-
-        $ads = $query->get();
-
-        return view('ads.index', compact('ads'));
-    }
-
-    public function create()
-    {
-        return view('ads.create');
-    }
-
+    // Метод для создания объявления
     public function store(Request $request)
     {
-        $request->validate([
-            'title' => 'required',
-            'description' => 'required',
+        $validatedData = $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'required|string',
             'price' => 'required|numeric',
         ]);
-
-        $ad = new Ad($request->all());
-        $ad->user_id = auth()->id();
+    
+        $ad = new Ad();
+        $ad->title = $validatedData['title'];
+        $ad->description = $validatedData['description'];
+        $ad->price = $validatedData['price'];
+        $ad->user_id = auth()->id(); // Устанавливаем user_id
+    
         $ad->save();
-
-        return redirect()->route('ads.index');
+    
+        return response()->json($ad, 201);
     }
 
+    // Метод для получения списка объявлений
+    public function index()
+    {
+        $ads = Ad::all();
+
+        return response()->json($ads);
+    }
+
+    // Метод для получения одного объявления
     public function show($id)
     {
-        $ad = Ad::findOrFail($id);
-        return view('ads.show', compact('ad'));
+        $ad = Ad::with('comments.user')->findOrFail($id);
+
+        return response()->json([
+            'ad' => $ad
+        ]);
     }
 
-    public function edit($id)
+    // Метод для обновления объявления
+    public function update(Request $request, Ad $ad)
     {
-        $ad = Ad::findOrFail($id);
-
-        if ($ad->user_id !== auth()->id() && !auth()->user()->isAdmin()) {
-            return redirect()->route('ads.index')->with('error', 'У вас нет прав для редактирования этого объявления');
-        }
-
-        return view('ads.edit', compact('ad'));
-    }
-
-    public function update(Request $request, $id)
-    {
-        $ad = Ad::findOrFail($id);
-
-        if ($ad->user_id !== auth()->id() && !auth()->user()->isAdmin()) {
-            return redirect()->route('ads.index')->with('error', 'У вас нет прав для редактирования этого объявления');
-        }
-
-        $request->validate([
-            'title' => 'required',
-            'description' => 'required',
-            'price' => 'required|numeric',
+        $validated = $request->validate([
+            'title' => 'sometimes|string|max:255',
+            'description' => 'sometimes|string',
+            'price' => 'sometimes|numeric',
         ]);
 
-        $ad->update($request->all());
+        $ad->update($validated);
 
-        return redirect()->route('ads.show', $ad->id);
+        return response()->json([
+            'data' => $ad
+        ]);
     }
 
-    public function destroy($id)
+    // Метод для удаления объявления
+    public function destroy(Ad $ad)
     {
-        $ad = Ad::findOrFail($id);
-
-        if ($ad->user_id !== auth()->id() && !auth()->user()->isAdmin()) {
-            return redirect()->route('ads.index')->with('error', 'У вас нет прав для удаления этого объявления');
-        }
-
         $ad->delete();
-
-        return redirect()->route('ads.index');
+        return response()->json(['message' => 'Ad deleted successfully']);
     }
 
-    public function myAds()
+    public function search(Request $request)
     {
-        $ads = auth()->user()->ads()->latest()->get();
-        return view('ads.my_ads', compact('ads'));
+        $query = $request->input('title');
+
+        $ads = Ad::where('title', 'like', "%{$query}%")->latest()->get();
+
+        return response()->json($ads);
     }
 }

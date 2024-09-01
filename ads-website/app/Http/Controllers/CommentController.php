@@ -3,23 +3,35 @@
 namespace App\Http\Controllers;
 
 use App\Models\Comment;
-use App\Models\Ad;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class CommentController extends Controller
 {
+    /**
+     * Store a newly created comment in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $adId
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function store(Request $request, $adId)
     {
-        $request->validate([
-            'content' => 'required',
+        // Валидация входящих данных
+        $validated = $request->validate([
+            'content' => 'required|string|max:255',
         ]);
 
-        $comment = new Comment();
-        $comment->ad_id = $adId;
-        $comment->user_id = auth()->id();
-        $comment->content = $request->content;
-        $comment->save();
+        // Создание нового комментария
+        $comment = Comment::create([
+            'ad_id' => $adId,
+            'user_id' => Auth::id(),
+            'content' => $validated['content'],
+        ]);
 
-        return redirect()->route('ads.show', $adId);
+        return response()->json([
+            'message' => 'Comment added successfully',
+            'comment' => $comment
+        ], 201);
     }
 }

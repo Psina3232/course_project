@@ -11,6 +11,7 @@ Route::post('ads/{ad}/comments', [CommentController::class, 'store'])->name('com
 
 Route::resource('ads', AdController::class);
 Route::get('/', [AdController::class, 'index'])->name('home');
+Route::get('/ads', [AdController::class, 'index']);
 
 Route::middleware(['auth'])->group(function () {
     Route::resource('ads', AdController::class);
@@ -30,6 +31,7 @@ Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name
 
 Route::get('/search', [AdController::class, 'search'])->name('ads.search');
 
-Route::get('/my-ads', [UserController::class, 'myAds'])->middleware('auth')->name('user.my_ads');
+Route::middleware('auth:sanctum')->get('/my-ads', [UserController::class, 'myAds']);
+
 
 
