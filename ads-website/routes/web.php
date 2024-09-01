@@ -33,5 +33,14 @@ Route::get('/search', [AdController::class, 'search'])->name('ads.search');
 
 Route::middleware('auth:sanctum')->get('/my-ads', [UserController::class, 'myAds']);
 
+// Добавление объявления в избранное
+Route::middleware('auth:sanctum')->post('/ads/{adId}/favorites', [UserController::class, 'addFavorite']);
+
+// Удаление объявления из избранного
+Route::middleware('auth:sanctum')->delete('/ads/{adId}/favorites', [UserController::class, 'removeFavorite']);
+
+// Получение списка избранных объявлений
+Route::middleware('auth:sanctum')->get('/favorites', [UserController::class, 'favoriteAds']);
+
 
 
