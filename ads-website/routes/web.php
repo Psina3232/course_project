@@ -43,4 +43,10 @@ Route::middleware('auth:sanctum')->delete('/ads/{adId}/favorites', [UserControll
 Route::middleware('auth:sanctum')->get('/favorites', [UserController::class, 'favoriteAds']);
 
 
+// редактирование комментария
+Route::middleware('auth:sanctum')->put('/comments/{id}', [CommentController::class, 'update']);
+
+// Удаление комментария
+Route::middleware('auth:sanctum')->delete('/comments/{id}', [CommentController::class, 'destroy']);
+
 

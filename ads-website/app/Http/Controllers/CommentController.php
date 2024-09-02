@@ -34,4 +34,38 @@ class CommentController extends Controller
             'comment' => $comment
         ], 201);
     }
+
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+            'content' => 'required',
+        ]);
+
+        $comment = Comment::findOrFail($id);
+
+        // Проверка прав пользователя
+        if ($comment->user_id !== auth()->id() && !auth()->user()->is_admin) {
+            return response()->json(['message' => 'You are not authorized to edit this comment'], 403);
+        }
+
+        $comment->content = $request->content;
+        $comment->save();
+
+        return response()->json(['message' => 'Comment updated successfully', 'comment' => $comment], 200);
+    }
+
+    // Метод для удаления комментария
+    public function destroy($id)
+    {
+        $comment = Comment::findOrFail($id);
+
+        // Проверка прав пользователя
+        if ($comment->user_id !== auth()->id() && !auth()->user()->is_admin) {
+            return response()->json(['message' => 'You are not authorized to delete this comment'], 403);
+        }
+
+        $comment->delete();
+
+        return response()->json(['message' => 'Comment deleted successfully'], 200);
+    }
 }
