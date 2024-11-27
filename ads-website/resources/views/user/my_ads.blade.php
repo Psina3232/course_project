@@ -2,7 +2,7 @@
 
 @section('content')
     <div class="container">
-        <h1>Профиль {{ $user->name }}</h1>
+        <h1>Профиль {{ Auth::user()->name }}</h1>
 
         <h2>Мои объявления</h2>
         @foreach ($ads as $ad)

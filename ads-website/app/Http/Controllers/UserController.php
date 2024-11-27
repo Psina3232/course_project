@@ -8,16 +8,30 @@ use App\Models\Ad;
 
 class UserController extends Controller
 {
-    public function myAds()
+    /**
+     * Показать список объявлений пользователя.
+     *
+     * @return \Illuminate\Http\JsonResponse|\Illuminate\Contracts\View\View
+     */
+    public function myAds(Request $request)
     {
         $user = Auth::user();
-
         $ads = $user->ads()->latest()->get();
 
-        return response()->json($ads);
+        if ($request->wantsJson()) {
+            return response()->json($ads);
+        }
+
+        return view('user.my_ads', compact('ads'));
     }
 
-    public function addFavorite($adId)
+    /**
+     * Добавить объявление в избранное.
+     *
+     * @param  int  $adId
+     * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\RedirectResponse
+     */
+    public function addFavorite($adId, Request $request)
     {
         $user = auth()->user();
         $ad = Ad::findOrFail($adId);
@@ -25,18 +39,23 @@ class UserController extends Controller
         // Добавляем объявление в избранное
         $user->favorites()->attach($adId);
 
-        return response()->json([
-            'message' => 'Ad added to favorites'
-        ], 200);
+        if ($request->wantsJson()) {
+            return response()->json([
+                'message' => 'Ad added to favorites'
+            ], 200);
+        }
+
+        // Перенаправление обратно на страницу объявления
+        return redirect()->route('ads.show', $adId);
     }
 
     /**
      * Удалить объявление из избранного.
      *
      * @param  int  $adId
-     * @return \Illuminate\Http\JsonResponse
+     * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\RedirectResponse
      */
-    public function removeFavorite($adId)
+    public function removeFavorite($adId, Request $request)
     {
         $user = auth()->user();
         $ad = Ad::findOrFail($adId);
@@ -44,23 +63,33 @@ class UserController extends Controller
         // Удаляем объявление из избранного
         $user->favorites()->detach($adId);
 
-        return response()->json([
-            'message' => 'Ad removed from favorites'
-        ], 200);
+        if ($request->wantsJson()) {
+            return response()->json([
+                'message' => 'Ad removed from favorites'
+            ], 200);
+        }
+
+        // Перенаправление обратно на страницу объявления
+        return redirect()->route('ads.show', $adId);
     }
 
     /**
      * Получить список избранных объявлений пользователя.
      *
-     * @return \Illuminate\Http\JsonResponse
+     * @return \Illuminate\Http\JsonResponse|\Illuminate\Contracts\View\View
      */
-    public function favoriteAds()
+    public function favoriteAds(Request $request)
     {
         $user = auth()->user();
         $favorites = $user->favorites()->latest()->get();
 
-        return response()->json([
-            'favorites' => $favorites
-        ]);
+        if ($request->wantsJson()) {
+            return response()->json([
+                'favorites' => $favorites
+            ]);
+        }
+
+        // Вернуть HTML-страницу со списком избранных объявлений
+        return view('user.favorites', compact('favorites'));
     }
 }

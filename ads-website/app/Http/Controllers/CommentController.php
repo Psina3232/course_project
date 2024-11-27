@@ -13,28 +13,38 @@ class CommentController extends Controller
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  int  $adId
-     * @return \Illuminate\Http\JsonResponse
+     * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\RedirectResponse
      */
     public function store(Request $request, $adId)
     {
-        // Валидация входящих данных
         $validated = $request->validate([
             'content' => 'required|string|max:255',
         ]);
 
-        // Создание нового комментария
         $comment = Comment::create([
             'ad_id' => $adId,
             'user_id' => Auth::id(),
             'content' => $validated['content'],
         ]);
 
-        return response()->json([
-            'message' => 'Comment added successfully',
-            'comment' => $comment
-        ], 201);
+        if ($request->wantsJson()) {
+            return response()->json([
+                'message' => 'Comment added successfully',
+                'comment' => $comment
+            ], 201);
+        }
+
+        // Вернуть HTML-страницу, например, перенаправить обратно на страницу объявления
+        return redirect()->route('ads.show', $adId);
     }
 
+    /**
+     * Update the specified comment in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\RedirectResponse
+     */
     public function update(Request $request, $id)
     {
         $request->validate([
@@ -45,27 +55,48 @@ class CommentController extends Controller
 
         // Проверка прав пользователя
         if ($comment->user_id !== auth()->id() && !auth()->user()->is_admin) {
-            return response()->json(['message' => 'You are not authorized to edit this comment'], 403);
+            if ($request->wantsJson()) {
+                return response()->json(['message' => 'You are not authorized to edit this comment'], 403);
+            }
+            return redirect()->back()->withErrors(['message' => 'You are not authorized to edit this comment']);
         }
 
         $comment->content = $request->content;
         $comment->save();
 
-        return response()->json(['message' => 'Comment updated successfully', 'comment' => $comment], 200);
+        if ($request->wantsJson()) {
+            return response()->json(['message' => 'Comment updated successfully', 'comment' => $comment], 200);
+        }
+
+        // Вернуть HTML-страницу, например, перенаправить обратно на страницу объявления
+        return redirect()->route('ads.show', $comment->ad_id);
     }
 
-    // Метод для удаления комментария
-    public function destroy($id)
+    /**
+     * Remove the specified comment from storage.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\RedirectResponse
+     */
+    public function destroy($id, Request $request)
     {
         $comment = Comment::findOrFail($id);
 
         // Проверка прав пользователя
         if ($comment->user_id !== auth()->id() && !auth()->user()->is_admin) {
-            return response()->json(['message' => 'You are not authorized to delete this comment'], 403);
+            if ($request->wantsJson()) {
+                return response()->json(['message' => 'You are not authorized to delete this comment'], 403);
+            }
+            return redirect()->back()->withErrors(['message' => 'You are not authorized to delete this comment']);
         }
 
         $comment->delete();
 
-        return response()->json(['message' => 'Comment deleted successfully'], 200);
+        if ($request->wantsJson()) {
+            return response()->json(['message' => 'Comment deleted successfully'], 200);
+        }
+
+        // Вернуть HTML-страницу, например, перенаправить обратно на страницу объявления
+        return redirect()->route('ads.show', $comment->ad_id);
     }
 }

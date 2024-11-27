@@ -3,10 +3,10 @@
 @section('content')
 <div class="container">
     <h1 class="my-4">Список объявлений</h1>
-    <form action="{{ route('ads.index') }}" method="GET" class="form-inline mb-4">
-        <input type="text" name="search" placeholder="Поиск..." class="form-control mr-2">
-        <button type="submit" class="btn btn-primary">Искать</button>
-    </form>
+    <form action="{{ route('ads.search') }}" method="GET" class="form-inline mb-4">
+    <input type="text" name="search" placeholder="Поиск..." class="form-control mr-2">
+    <button type="submit" class="btn btn-primary">Искать</button>
+</form>
 
     <a href="{{ route('ads.create') }}" class="btn btn-success mb-4">Создать новое объявление</a>
 
