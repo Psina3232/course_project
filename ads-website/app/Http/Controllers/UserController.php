@@ -36,7 +36,6 @@ class UserController extends Controller
         $user = auth()->user();
         $ad = Ad::findOrFail($adId);
 
-        // Добавляем объявление в избранное
         $user->favorites()->attach($adId);
 
         if ($request->wantsJson()) {
@@ -45,7 +44,6 @@ class UserController extends Controller
             ], 200);
         }
 
-        // Перенаправление обратно на страницу объявления
         return redirect()->route('ads.show', $adId);
     }
 
@@ -60,7 +58,6 @@ class UserController extends Controller
         $user = auth()->user();
         $ad = Ad::findOrFail($adId);
 
-        // Удаляем объявление из избранного
         $user->favorites()->detach($adId);
 
         if ($request->wantsJson()) {
@@ -69,7 +66,6 @@ class UserController extends Controller
             ], 200);
         }
 
-        // Перенаправление обратно на страницу объявления
         return redirect()->route('ads.show', $adId);
     }
 
@@ -89,7 +85,6 @@ class UserController extends Controller
             ]);
         }
 
-        // Вернуть HTML-страницу со списком избранных объявлений
         return view('user.favorites', compact('favorites'));
     }
 }

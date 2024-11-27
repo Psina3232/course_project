@@ -59,7 +59,6 @@ public function isAdmin()
     return $this->is_admin;
 }
 
-// избранное
 public function favorites()
 {
     return $this->belongsToMany(Ad::class, 'favorites');

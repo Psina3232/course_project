@@ -34,7 +34,6 @@ class CommentController extends Controller
             ], 201);
         }
 
-        // Вернуть HTML-страницу, например, перенаправить обратно на страницу объявления
         return redirect()->route('ads.show', $adId);
     }
 
@@ -53,7 +52,6 @@ class CommentController extends Controller
 
         $comment = Comment::findOrFail($id);
 
-        // Проверка прав пользователя
         if ($comment->user_id !== auth()->id() && !auth()->user()->is_admin) {
             if ($request->wantsJson()) {
                 return response()->json(['message' => 'You are not authorized to edit this comment'], 403);
@@ -68,7 +66,6 @@ class CommentController extends Controller
             return response()->json(['message' => 'Comment updated successfully', 'comment' => $comment], 200);
         }
 
-        // Вернуть HTML-страницу, например, перенаправить обратно на страницу объявления
         return redirect()->route('ads.show', $comment->ad_id);
     }
 
@@ -82,7 +79,6 @@ class CommentController extends Controller
     {
         $comment = Comment::findOrFail($id);
 
-        // Проверка прав пользователя
         if ($comment->user_id !== auth()->id() && !auth()->user()->is_admin) {
             if ($request->wantsJson()) {
                 return response()->json(['message' => 'You are not authorized to delete this comment'], 403);
@@ -96,7 +92,6 @@ class CommentController extends Controller
             return response()->json(['message' => 'Comment deleted successfully'], 200);
         }
 
-        // Вернуть HTML-страницу, например, перенаправить обратно на страницу объявления
         return redirect()->route('ads.show', $comment->ad_id);
     }
 }
