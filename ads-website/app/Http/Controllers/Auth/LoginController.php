@@ -29,24 +29,18 @@ class LoginController extends Controller
         $this->middleware('guest')->except('logout');
     }
 
-    // Переопределение метода login
     public function login(Request $request)
     {
-        // Валидация входящих данных
         $credentials = $request->validate([
             'email' => ['required', 'email'],
             'password' => ['required'],
         ]);
 
-        // Попытка аутентификации
         if (Auth::attempt($credentials)) {
-            // Аутентификация успешна
             $user = Auth::user();
 
-            // Генерация токена
             $token = $user->createToken('authToken')->plainTextToken;
 
-            // Возвращаем JSON-ответ с токеном, типом токена и временем действия
             return response()->json([
                 'data' => [
                     'access_token' => $token,
@@ -56,18 +50,14 @@ class LoginController extends Controller
             ], 200);
         }
 
-        // Если аутентификация не удалась
         return response()->json([
             'message' => 'Invalid credentials'
         ], 401);
     }
 
-    // Метод для выхода из системы (logout)
     public function logout(Request $request)
     {
-        // Убедитесь, что пользователь аутентифицирован
         if ($user = $request->user()) {
-            // Удаление текущего токена (если существует)
             if ($token = $user->currentAccessToken()) {
                 $token->delete();
             }
